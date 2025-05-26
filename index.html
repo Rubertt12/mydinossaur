@@ -25,6 +25,7 @@
       margin-bottom: 15px;
       color: #034078;
       text-shadow: 1px 1px 3px #a0c8f0;
+      text-align: center;
     }
 
     #quiz-container {
@@ -37,28 +38,31 @@
       flex-wrap: wrap;
       padding: 20px;
       gap: 20px;
-      align-items: center;
+      align-items: flex-start;
       justify-content: center;
     }
 
     #dino-image {
-      max-width: 300px;
-      max-height: 300px;
+      max-width: 100%;
+      width: 300px;
+      height: auto;
       border-radius: 15px;
       cursor: pointer;
       box-shadow: 0 4px 12px rgba(0,0,0,0.2);
       transition: transform 0.3s ease;
+      flex-shrink: 0;
     }
     #dino-image:hover {
       transform: scale(1.05);
     }
 
     #options {
-      flex: 1;
+      flex: 1 1 300px;
       display: flex;
       flex-direction: column;
       gap: 12px;
       min-width: 220px;
+      max-width: 100%;
     }
     #options button {
       padding: 12px 20px;
@@ -70,6 +74,8 @@
       cursor: pointer;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       transition: background-color 0.3s ease;
+      width: 100%;
+      text-align: center;
     }
     #options button:hover:not(:disabled) {
       background-color: #4483ff;
@@ -99,12 +105,23 @@
       width: 100%;
     }
 
+    #score {
+      margin-top: 10px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #034078;
+      user-select: none;
+      text-align: center;
+      width: 100%;
+    }
+
     #controls {
       margin-top: 20px;
       display: flex;
       justify-content: center;
       gap: 15px;
       width: 100%;
+      flex-wrap: wrap;
     }
     button#next, button#restart {
       padding: 12px 30px;
@@ -116,22 +133,15 @@
       cursor: pointer;
       box-shadow: 0 4px 15px rgba(0,64,128,0.7);
       transition: background-color 0.3s ease;
+      min-width: 120px;
+      flex-grow: 1;
+      max-width: 200px;
     }
     button#next:hover, button#restart:hover {
       background-color: #022c50;
     }
     button#restart {
       display: none;
-    }
-
-    #score {
-      margin-top: 10px;
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: #034078;
-      user-select: none;
-      text-align: center;
-      width: 100%;
     }
 
     /* Modal styles */
@@ -163,6 +173,7 @@
       color: #034078;
       font-size: 1.8rem;
       text-align: center;
+      word-wrap: break-word;
     }
     #modal p {
       font-size: 1.1rem;
@@ -170,6 +181,7 @@
       color: #444;
       white-space: pre-wrap;
       min-height: 80px;
+      overflow-wrap: break-word;
     }
     #modal button {
       padding: 10px 18px;
@@ -178,6 +190,7 @@
       font-size: 1rem;
       cursor: pointer;
       transition: background-color 0.3s ease;
+      max-width: 100%;
     }
     #translate-btn {
       background-color: #007bff;
@@ -200,16 +213,41 @@
       background-color: #a71d2a;
     }
 
+    /* Responsividade */
+    @media (max-width: 900px) {
+      #quiz-container {
+        max-width: 100%;
+        padding: 15px;
+      }
+      #dino-image {
+        width: 250px;
+        max-height: 250px;
+      }
+      #options {
+        flex-basis: 100%;
+      }
+    }
+
     @media (max-width: 600px) {
       #quiz-container {
         flex-direction: column;
         align-items: center;
+        padding: 10px;
       }
       #dino-image {
-        max-width: 90vw;
+        width: 90vw;
         max-height: 250px;
+        margin-bottom: 15px;
       }
       #options {
+        width: 100%;
+      }
+      #controls {
+        flex-direction: column;
+        gap: 10px;
+      }
+      button#next, button#restart {
+        max-width: 100%;
         width: 100%;
       }
     }
@@ -222,10 +260,10 @@
     <img id="dino-image" src="" alt="Imagem do Dinossauro" title="Clique para mais informações" />
     <div id="options" class="options"></div>
     <div id="feedback"></div>
-    <div id="score">Pontuação: 0</div>
+    <div id="score">Points: 0</div>
     <div id="controls">
-      <button id="next">Próxima</button>
-      <button id="restart">Reiniciar</button>
+      <button id="next">Next</button>
+      <button id="restart">Reload</button>
     </div>
   </div>
 
