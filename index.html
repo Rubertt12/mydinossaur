@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quiz de Dinossauros</title>
+  <style>
+    /* Reset básico */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%);
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      color: #333;
+    }
+
+    h1 {
+      margin-bottom: 15px;
+      color: #034078;
+      text-shadow: 1px 1px 3px #a0c8f0;
+    }
+
+    #quiz-container {
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      max-width: 700px;
+      width: 100%;
+      display: flex;
+      flex-wrap: wrap;
+      padding: 20px;
+      gap: 20px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #dino-image {
+      max-width: 300px;
+      max-height: 300px;
+      border-radius: 15px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      transition: transform 0.3s ease;
+    }
+    #dino-image:hover {
+      transform: scale(1.05);
+    }
+
+    #options {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      min-width: 220px;
+    }
+    #options button {
+      padding: 12px 20px;
+      font-size: 1.1rem;
+      background: #66a6ff;
+      border: none;
+      border-radius: 10px;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: background-color 0.3s ease;
+    }
+    #options button:hover:not(:disabled) {
+      background-color: #4483ff;
+    }
+    #options button.correct {
+      background-color: #28a745 !important;
+      box-shadow: 0 0 10px #28a745aa;
+      cursor: default;
+    }
+    #options button.incorrect {
+      background-color: #dc3545 !important;
+      box-shadow: 0 0 10px #dc3545aa;
+      cursor: default;
+    }
+    #options button:disabled {
+      cursor: default;
+      opacity: 0.75;
+    }
+
+    #feedback {
+      margin-top: 15px;
+      font-size: 1.2rem;
+      min-height: 24px;
+      font-weight: 600;
+      color: #034078;
+      text-align: center;
+      width: 100%;
+    }
+
+    #controls {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      width: 100%;
+    }
+    button#next, button#restart {
+      padding: 12px 30px;
+      font-size: 1rem;
+      border-radius: 12px;
+      border: none;
+      background-color: #034078;
+      color: white;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0,64,128,0.7);
+      transition: background-color 0.3s ease;
+    }
+    button#next:hover, button#restart:hover {
+      background-color: #022c50;
+    }
+    button#restart {
+      display: none;
+    }
+
+    #score {
+      margin-top: 10px;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #034078;
+      user-select: none;
+      text-align: center;
+      width: 100%;
+    }
+
+    /* Modal styles */
+    #modal-bg {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(5px);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 15px;
+    }
+    #modal {
+      background: white;
+      max-width: 450px;
+      width: 100%;
+      border-radius: 15px;
+      padding: 25px 30px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    #modal h3 {
+      margin: 0;
+      color: #034078;
+      font-size: 1.8rem;
+      text-align: center;
+    }
+    #modal p {
+      font-size: 1.1rem;
+      line-height: 1.5;
+      color: #444;
+      white-space: pre-wrap;
+      min-height: 80px;
+    }
+    #modal button {
+      padding: 10px 18px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    #translate-btn {
+      background-color: #007bff;
+      color: white;
+      box-shadow: 0 4px 12px rgba(0,123,255,0.6);
+    }
+    #translate-btn:hover:not(:disabled) {
+      background-color: #0056b3;
+    }
+    #translate-btn:disabled {
+      opacity: 0.7;
+      cursor: progress;
+    }
+    #modal-close {
+      background-color: #dc3545;
+      color: white;
+      box-shadow: 0 4px 12px rgba(220,53,69,0.6);
+    }
+    #modal-close:hover {
+      background-color: #a71d2a;
+    }
+
+    @media (max-width: 600px) {
+      #quiz-container {
+        flex-direction: column;
+        align-items: center;
+      }
+      #dino-image {
+        max-width: 90vw;
+        max-height: 250px;
+      }
+      #options {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <h1>Quiz de Dinossauros</h1>
+
+  <div id="quiz-container">
+    <img id="dino-image" src="" alt="Imagem do Dinossauro" title="Clique para mais informações" />
+    <div id="options" class="options"></div>
+    <div id="feedback"></div>
+    <div id="score">Pontuação: 0</div>
+    <div id="controls">
+      <button id="next">Próxima</button>
+      <button id="restart">Reiniciar</button>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div id="modal-bg">
+    <div id="modal">
+      <h3 id="modal-title">Título do Dinossauro</h3>
+      <p id="modal-description">Descrição do dinossauro.</p>
+      <button id="translate-btn">Traduzir para Português</button>
+      <button id="modal-close">Fechar</button>
+    </div>
+  </div>
+
+  <script>
+    const apiUrl = 'https://dinoapi.brunosouzadev.com/api/dinosaurs';
+    let dinosaurs = [];
+    let currentDino = null;
+    let score = 0;
+
+    const img = document.getElementById('dino-image');
+    const optionsDiv = document.getElementById('options');
+    const feedback = document.getElementById('feedback');
+    const nextBtn = document.getElementById('next');
+    const restartBtn = document.getElementById('restart');
+    const scoreDiv = document.getElementById('score');
+
+    const modalBg = document.getElementById('modal-bg');
+    const modalTitle = document.getElementById('modal-title');
+    const modalDescription = document.getElementById('modal-description');
+    const modalClose = document.getElementById('modal-close');
+    const translateBtn = document.getElementById('translate-btn');
+
+    let originalDescription = '';
+    let isTranslated = false;
+    let translatedDescription = '';
+
+    async function fetchDinosaurs() {
+      try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error('Erro ao carregar dados dos dinossauros.');
+        const data = await response.json();
+        dinosaurs = data;
+        resetQuiz();
+      } catch (error) {
+        alert('Erro ao carregar os dinossauros. Tente recarregar a página.');
+        console.error(error);
+      }
+    }
+
+    function resetQuiz() {
+      score = 0;
+      scoreDiv.textContent = `Pontuação: ${score}`;
+      nextBtn.style.display = 'none';
+      restartBtn.style.display = 'none';
+      feedback.textContent = '';
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      feedback.textContent = '';
+      nextBtn.style.display = 'none';
+      optionsDiv.innerHTML = '';
+
+      if (dinosaurs.length === 0) {
+        feedback.textContent = 'Sem dinossauros disponíveis.';
+        return;
+      }
+
+      currentDino = dinosaurs[Math.floor(Math.random() * dinosaurs.length)];
+      img.src = currentDino.image;
+      img.alt = currentDino.name;
+
+      // Criar opções
+      const options = [currentDino.name];
+      while (options.length < 4) {
+        const random = dinosaurs[Math.floor(Math.random() * dinosaurs.length)];
+        if (!options.includes(random.name)) {
+          options.push(random.name);
+        }
+      }
+      shuffleArray(options);
+
+      options.forEach(option => {
+        const button = document.createElement('button');
+        button.textContent = option;
+        button.onclick = () => checkAnswer(button, option);
+        optionsDiv.appendChild(button);
+      });
+    }
+
+    function checkAnswer(button, selected) {
+      const allButtons = document.querySelectorAll('#options button');
+      allButtons.forEach(btn => btn.disabled = true);
+
+      if (selected === currentDino.name) {
+        button.classList.add('correct');
+        feedback.textContent = '🎉 Acertou! Muito bem!';
+        score++;
+      } else {
+        button.classList.add('incorrect');
+        feedback.textContent = `😬 Ops! Era o ${currentDino.name}. Clique na imagem para saber mais!`;
+        allButtons.forEach(btn => {
+          if (btn.textContent === currentDino.name) {
+            btn.classList.add('correct');
+          }
+        });
+        // Abrir modal automaticamente quando errar
+        showModal(currentDino);
+      }
+
+      scoreDiv.textContent = `Pontuação: ${score}`;
+      nextBtn.style.display = 'inline-block';
+    }
+
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+    }
+
+    nextBtn.addEventListener('click', () => {
+      loadQuestion();
+    });
+
+    restartBtn.addEventListener('click', () => {
+      resetQuiz();
+    });
+
+    img.addEventListener('click', () => {
+      if (currentDino) {
+        showModal(currentDino);
+      }
+    });
+
+    modalClose.addEventListener('click', () => {
+      modalBg.style.display = 'none';
+      // Reset tradução ao fechar modal
+      isTranslated = false;
+      modalDescription.textContent = originalDescription;
+      translateBtn.textContent = 'Traduzir para Português';
+      translateBtn.disabled = false;
+    });
+
+    modalBg.addEventListener('click', (e) => {
+      if (e.target === modalBg) {
+        modalBg.style.display = 'none';
+        // Reset tradução ao fechar modal
+        isTranslated = false;
+        modalDescription.textContent = originalDescription;
+        translateBtn.textContent = 'Traduzir para Português';
+        translateBtn.disabled = false;
+      }
+    });
+
+    function showModal(dino) {
+      modalTitle.textContent = dino.name;
+      originalDescription = dino.description || 'Descrição não disponível.';
+      translatedDescription = '';
+      isTranslated = false;
+      modalDescription.textContent = originalDescription;
+      translateBtn.textContent = 'Traduzir para Português';
+      translateBtn.disabled = false;
+      modalBg.style.display = 'flex';
+    }
+
+    async function translateText(text, targetLang = 'pt') {
+      const url = 'https://libretranslate.de/translate';
+      const body = {
+        q: text,
+        source: 'en',
+        target: targetLang,
+        format: 'text',
+      };
+
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+        if (!res.ok) throw new Error('Erro na tradução');
+        const data = await res.json();
+        return data.translatedText;
+      } catch (error) {
+        alert('Erro ao traduzir. Tente novamente mais tarde.');
+        console.error(error);
+        return text;
+      }
+    }
+
+    translateBtn.addEventListener('click', async () => {
+      if (isTranslated) {
+        modalDescription.textContent = originalDescription;
+        translateBtn.textContent = 'Traduzir para Português';
+        isTranslated = false;
+      } else {
+        translateBtn.disabled = true;
+        translateBtn.textContent = 'Traduzindo...';
+        translatedDescription = await translateText(originalDescription);
+        modalDescription.textContent = translatedDescription;
+        translateBtn.textContent = 'Mostrar original';
+        translateBtn.disabled = false;
+        isTranslated = true;
+      }
+    });
+
+    // Começa o quiz ao carregar a página
+    fetchDinosaurs();
+  </script>
+</body>
+</html>
